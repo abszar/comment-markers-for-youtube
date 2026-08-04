@@ -51,6 +51,18 @@ Open source under the MIT licence: https://github.com/abszar/comment-markers-for
 Not affiliated with, endorsed by, or sponsored by YouTube or Google LLC.
 ```
 
+## Graphic assets tab
+
+| Field | File | Size |
+| --- | --- | --- |
+| Store icon (required) | `store/store-icon-128.png` | 128×128 |
+| Screenshots (required) | `store/screenshot-1.png`, `-2`, `-3` | 1280×800 |
+| Small promo tile | `store/promo-small-440x280.png` | 440×280 |
+| Marquee promo tile | `store/promo-marquee-1400x560.png` | 1400×560 |
+
+All of them are 24-bit PNG with no alpha channel, which is what the dashboard
+requires. Global promo video can be left empty.
+
 **Category:** Entertainment
 **Language:** English
 
