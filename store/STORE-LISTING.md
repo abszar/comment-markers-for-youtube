@@ -97,6 +97,17 @@ Stores the user's own display preferences (marker colour, avatar size, popup dur
 The extension reads the public comments of the YouTube video the user is watching in order to extract timestamps, and injects markers and comment cards into that video's player. It runs on no other website.
 ```
 
+**Are you using remote code?** → **No, I am not using remote code.**
+
+All JavaScript is bundled in the package. The extension fetches JSON data from
+YouTube's own endpoint, which is data and not executable code; nothing is
+`eval`'d and no external script is loaded. If a justification box is shown
+anyway:
+
+```
+The extension executes no remote code. All JavaScript is contained in the uploaded package. The only network request is a JSON data request to YouTube's own endpoint from the page the user is already on; the response is parsed as data and never evaluated or executed.
+```
+
 **Data usage — tick nothing.** The extension collects none of the listed categories.
 Then certify all three:
 
@@ -109,6 +120,16 @@ Then certify all three:
 ```
 https://abszar.github.io/comment-markers-for-youtube/privacy.html
 ```
+
+---
+
+## Account settings (once per account, not per item)
+
+Settings page of the dashboard:
+
+- **Publisher contact email** - required before any item can be published
+- **Verify that email** - Google sends a confirmation link; the item stays
+  unpublishable until you click it
 
 ---
 
