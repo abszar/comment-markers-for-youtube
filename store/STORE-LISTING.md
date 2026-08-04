@@ -108,7 +108,23 @@ anyway:
 The extension executes no remote code. All JavaScript is contained in the uploaded package. The only network request is a JSON data request to YouTube's own endpoint from the page the user is already on; the response is parsed as data and never evaluated or executed.
 ```
 
-**Data usage — tick nothing.** The extension collects none of the listed categories.
+**Data usage — tick "Website content" only.**
+
+Google requires disclosure of data the extension *handles*, and their User Data
+FAQ states this applies "even when data is processed or stored locally on a
+user's device and is not transmitted to external servers or third parties."
+The extension reads comment text, commenter display names and avatar images
+from the page in order to display them, so "Website content" applies even
+though nothing is transmitted or stored.
+
+Leave every other category unticked:
+
+- Personally identifiable information - no. Nothing about the user is read.
+- Authentication information - no. Credentials are never read or handled.
+- User activity - no. Player and pointer events are used transiently to
+  position the UI; nothing is logged, stored or analysed.
+- All others - no.
+
 Then certify all three:
 
 - [x] I do not sell or transfer user data to third parties, outside of the approved use cases

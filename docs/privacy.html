@@ -43,6 +43,15 @@
   Comment text and commenter names are read from the page, displayed to you, and discarded
   when you leave the page. They are never stored or transmitted.</p>
 
+  <h2>Website content handled locally</h2>
+  <p>To do its job the extension reads the public comments of the current video:
+  the comment text, the commenter's display name, and their avatar image. Chrome
+  Web Store classifies this as "website content", so it is disclosed on the store
+  listing. It is used only to draw the markers and comment cards you see in the
+  player. It is <strong>never transmitted anywhere, never stored, and never
+  shared</strong> &mdash; it exists in the page's memory while you are on that
+  video and is gone when you navigate away.</p>
+
   <h2>Network requests</h2>
   <p>The only requests the extension makes are to <code>www.youtube.com</code>, from the
   YouTube page you already have open, to load the comments of the current video &mdash;
