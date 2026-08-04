@@ -54,7 +54,11 @@ Not affiliated with, endorsed by, or sponsored by YouTube or Google LLC.
 **Category:** Entertainment
 **Language:** English
 
-**Screenshots:** upload `store/screenshot-1.png` and `store/screenshot-2.png` (both 1280×800)
+**Screenshots:** upload `store/screenshot-1.png`, `store/screenshot-2.png` and `store/screenshot-3.png` (all 1280×800)
+
+1. Timeline markers and a comment popping up during playback
+2. Hovering the timeline, comment card above YouTube's own preview
+3. The settings page
 
 **Official URL / homepage:** `https://abszar.github.io/comment-markers-for-youtube/`
 **Support URL:** `https://github.com/abszar/comment-markers-for-youtube/issues`
