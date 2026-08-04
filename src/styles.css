@@ -1,0 +1,273 @@
+/* ---------------------------------------------------------- progress markers */
+
+.ytct-marker-layer {
+  position: absolute;
+  inset: 0;
+  /* never intercept the pointer: YouTube's own scrub preview keeps working */
+  pointer-events: none;
+  z-index: 39;
+  --ytct-color: #ffffff;
+}
+
+.ytct-marker {
+  position: absolute;
+  top: 50%;
+  width: 2px;
+  height: 8px;
+  margin-left: -1px;
+  border-radius: 1px;
+  background: var(--ytct-color, #fff);
+  opacity: 0.45;
+  transform: translateY(-50%);
+  pointer-events: none;
+  transition: opacity 0.12s ease, height 0.12s ease;
+}
+
+/* several comments at the same moment: slightly taller, a touch brighter */
+.ytct-marker--multi {
+  height: 11px;
+  opacity: 0.62;
+}
+
+/* comments that look like a full chapter list stay in the background */
+.ytct-marker--chapter {
+  opacity: 0.22;
+  height: 6px;
+}
+
+.ytp-progress-bar-container:hover .ytct-marker { opacity: 0.75; }
+.ytp-progress-bar-container:hover .ytct-marker--chapter { opacity: 0.4; }
+
+/* optional: tiny commenter avatars floating just above the bar */
+.ytct-avatar.ytct-marker-avatar {
+  position: absolute;
+  box-sizing: border-box;
+  bottom: 100%;
+  margin-bottom: 3px;
+  width: var(--ytct-avatar-size, 15px);
+  height: var(--ytct-avatar-size, 15px);
+  font-size: calc(var(--ytct-avatar-size, 15px) * 0.58);
+  transform: translateX(-50%);
+  opacity: 0.7;
+  border: 0.5px solid rgba(0, 0, 0, 0.55);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+}
+
+.ytct-avatar.ytct-marker-avatar--multi {
+  box-shadow: 0 0 0 0.5px rgba(255, 255, 255, 0.45), 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.ytp-progress-bar-container:hover .ytct-avatar.ytct-marker-avatar { opacity: 1; }
+
+/* ------------------------------------------------------------- comment cards */
+
+.ytct-bubble-layer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 64px;
+  height: 0;
+  pointer-events: none;
+  z-index: 60;
+}
+
+.ytct-card {
+  position: absolute;
+  bottom: 0;
+  max-width: min(400px, 44%);
+  padding: 9px 11px;
+  border-radius: 10px;
+  background: rgba(18, 18, 18, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #f1f1f1;
+  font-family: "Roboto", "YouTube Sans", Arial, sans-serif;
+  font-size: 13px;
+  line-height: 1.35;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.22s ease, transform 0.22s ease;
+  pointer-events: auto;
+  cursor: pointer;
+  backdrop-filter: blur(3px);
+}
+
+.ytct-card--in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* optional: playing popups pinned to the middle of the player */
+.ytct-card.ytct-bubble--center {
+  left: 0;
+  right: 0;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* being replaced by the next comment: get out of the way quickly */
+.ytct-card--out {
+  transition-duration: 0.14s;
+  pointer-events: none;
+}
+
+.ytct-main {
+  display: flex;
+  gap: 9px;
+  align-items: flex-start;
+}
+
+.ytct-main-avatar { flex: 0 0 auto; }
+
+.ytct-body { min-width: 0; }
+
+.ytct-head {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  margin-bottom: 2px;
+}
+
+.ytct-author {
+  font-weight: 600;
+  font-size: 12px;
+  color: #d0d0d0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 190px;
+}
+
+.ytct-time {
+  font-size: 11px;
+  color: #9a9a9a;
+  font-variant-numeric: tabular-nums;
+}
+
+.ytct-text {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 88px;
+  overflow: hidden;
+  color: #ececec;
+}
+
+/* ----------------------------------------------------- floating avatar strip */
+
+.ytct-others {
+  position: absolute;
+  bottom: 100%;
+  left: 8px;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+}
+
+.ytct-others > * { margin-right: -6px; }
+.ytct-others > *:last-child { margin-right: 0; }
+
+.ytct-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #3a3a3a;
+  color: #e0e0e0;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+}
+
+.ytct-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.ytct-avatar--sm {
+  width: 22px;
+  height: 22px;
+  font-size: 11px;
+  border: 1.5px solid rgba(18, 18, 18, 0.95);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+  opacity: 0.62;
+  cursor: pointer;
+  transition: opacity 0.12s ease, transform 0.12s ease;
+}
+
+.ytct-avatar--sm:hover { opacity: 1; transform: translateY(-2px); }
+
+.ytct-avatar--active {
+  opacity: 1;
+  border-color: rgba(255, 255, 255, 0.75);
+}
+
+/* every comment at the hovered spot, stacked - no tabs to click through */
+.ytct-item {
+  display: flex;
+  gap: 9px;
+  align-items: flex-start;
+}
+
+.ytct-item + .ytct-item {
+  margin-top: 9px;
+  padding-top: 9px;
+  border-top: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+.ytct-more {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.09);
+  font-size: 11.5px;
+  color: #9a9a9a;
+}
+
+.ytct-stack .ytct-text { max-height: 66px; }
+
+/* the card shown while scrubbing sits just above YouTube's preview thumbnail,
+   centred on whatever YouTube does with that preview */
+.ytct-hovercard {
+  max-width: min(420px, 46%);
+  transform: translate(-50%, 6px);
+}
+
+.ytct-hovercard.ytct-card--in {
+  transform: translate(-50%, 0);
+}
+
+/* while the timeline is hovered, the auto-popup steps aside;
+   it comes back as soon as the pointer leaves the bar */
+.ytct-bubble-layer.ytct-scrubbing .ytct-card.ytct-bubble {
+  opacity: 0;
+  transform: translateY(6px);
+  pointer-events: none;
+}
+
+/* the auto-popup gives a little shake as it lands, so it catches the eye
+   without needing to be loud about it. Scrub cards stay still. */
+@keyframes ytct-wiggle {
+  0%   { transform: translateY(7px) scale(0.92) rotate(0deg); }
+  40%  { transform: translateY(0) scale(1.04) rotate(-1.6deg); }
+  60%  { transform: translateY(0) scale(1.01) rotate(1.2deg); }
+  80%  { transform: translateY(0) scale(1) rotate(-0.6deg); }
+  100% { transform: translateY(0) scale(1) rotate(0deg); }
+}
+
+.ytct-card.ytct-bubble.ytct-card--in {
+  transform-origin: 50% 100%;
+  animation: ytct-wiggle 0.6s cubic-bezier(0.34, 1.28, 0.5, 1) both;
+}
+
+/* don't fight the fade-out when the timeline is being scrubbed */
+.ytct-bubble-layer.ytct-scrubbing .ytct-card.ytct-bubble { animation: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ytct-card.ytct-bubble.ytct-card--in { animation: none; }
+}
