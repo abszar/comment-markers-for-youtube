@@ -513,6 +513,8 @@
     return unit(n / 1e9, 'B');
   }
 
+  const CLOSE_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>';
+
   const OPEN_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7ZM5 5h5V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5h-2v5H5V5Z"/></svg>';
 
   /**
@@ -639,10 +641,18 @@
     const likes = document.createElement('span');
     likes.className = 'ytct-likes';
     const open = openLinkNode(cluster.items[0]);
+    const close = document.createElement('button');
+    close.type = 'button';
+    close.className = 'ytct-close';
+    close.title = 'Hide this comment';
+    close.setAttribute('aria-label', 'Hide this comment');
+    close.innerHTML = CLOSE_SVG;
     head.appendChild(who);
     head.appendChild(when);
     head.appendChild(likes);
     head.appendChild(open);
+    head.appendChild(close);
+    card.ytctClose = close;
 
     const text = document.createElement('div');
     text.className = 'ytct-text';
@@ -734,6 +744,13 @@
     card.style.bottom = '0px';
 
     const rec = { el: card, remaining: Math.max(1, Number(settings.popupDuration) || 5) * 1000, hovered: false };
+    if (card.ytctClose) {
+      card.ytctClose.addEventListener('click', (ev) => {
+        ev.stopPropagation();   // the card itself seeks on click
+        ev.preventDefault();
+        dismiss(rec, true);
+      });
+    }
     card.addEventListener('mouseenter', () => { rec.hovered = true; });
     card.addEventListener('mouseleave', () => { rec.hovered = false; });
 

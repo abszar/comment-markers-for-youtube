@@ -129,6 +129,7 @@
   gap: 8px;
   align-items: baseline;
   margin-bottom: 2px;
+  min-width: 150px;
 }
 
 .ytct-author {
@@ -161,6 +162,33 @@
   height: 11px;
   fill: currentColor;
   opacity: 0.85;
+}
+
+.ytct-close {
+  margin-left: auto;
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #8a8a8a;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.12s ease, background 0.12s ease, color 0.12s ease;
+}
+
+.ytct-close svg { width: 13px; height: 13px; fill: currentColor; }
+
+.ytct-card:hover .ytct-close { opacity: 1; }
+
+.ytct-close:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
 }
 
 .ytct-open {

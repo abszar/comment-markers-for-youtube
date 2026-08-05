@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.5.0
+
+- Playing popups now have a close button, so a comment you've finished
+  reading while paused can be dismissed without waiting or pressing play
+
 ## 1.4.0
 
 - New "On this video" switch in the toolbar popup, to turn the extension off
