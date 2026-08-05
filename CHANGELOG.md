@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.0
+
+- New icon: a comment bubble dropping onto the video timeline
+- Settings page and toolbar popup now show the icon in their header
+- Redrawn store icon and promo tiles to match
+
 ## 1.0.0
 
 First public release.
