@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.2.0
+
+- Comments now show their YouTube like count, formatted 1.2K / 12K / 1.2M
+- Fixed like counts being misread on non-English YouTube: "1,2 k" was parsed
+  as 12000 instead of 1200, which scrambled the most-liked-first ordering
+- Ties in like count now fall back to the earlier timestamp, so the order of
+  the avatar tabs is stable
+
 ## 1.1.1
 
 - Fixed the playing popup jumping when switching between comments of

@@ -221,14 +221,35 @@
     return '';
   }
 
+  /**
+   * YouTube writes like counts in the page's locale: "1.2K" in English but
+   * "1,2 k" in French, "1.234" in German. Stripping commas blindly turned
+   * "1,2 k" into 12000, which scrambled the most-liked-first ordering.
+   */
   function parseLikes(v) {
     if (v === undefined || v === null) return 0;
     if (typeof v === 'number') return v;
-    const s = String(v).trim().replace(/,/g, '').replace(/\s/g, '');
-    const m = s.match(/^([\d.]+)([KMB])?$/i);
+    // strip ordinary, non-breaking and narrow spaces
+    const s = String(v).trim().toUpperCase().replace(/[\s\u00a0\u202f]/g, '');
+    const m = s.match(/^([\d.,]+)([KMB])?$/);
     if (!m) return 0;
-    let n = parseFloat(m[1]);
-    const suf = (m[2] || '').toUpperCase();
+
+    let digits = m[1];
+    const suf = m[2] || '';
+    const sep = Math.max(digits.lastIndexOf(','), digits.lastIndexOf('.'));
+    if (sep >= 0) {
+      const tail = digits.length - sep - 1;
+      if (suf && tail <= 2) {
+        // "1,2 k" / "1.2K" - that separator is a decimal point
+        digits = `${digits.slice(0, sep).replace(/[.,]/g, '')}.${digits.slice(sep + 1)}`;
+      } else {
+        // "1,234" / "1.234" - grouping separators
+        digits = digits.replace(/[.,]/g, '');
+      }
+    }
+
+    let n = parseFloat(digits);
+    if (!Number.isFinite(n)) return 0;
     if (suf === 'K') n *= 1e3;
     else if (suf === 'M') n *= 1e6;
     else if (suf === 'B') n *= 1e9;
@@ -345,8 +366,9 @@
       }
     }
     for (const c of clusters) {
-      // most-liked comment leads; the rest become floating avatars
-      c.items.sort((a, b) => b.likes - a.likes);
+      // most-liked comment leads, both in the card and in the avatar strip;
+      // ties fall back to the earlier timestamp so the order never wobbles
+      c.items.sort((a, b) => (b.likes - a.likes) || (a.t - b.t));
       c.chapterish = c.items.every((i) => i.chapterish);
       if (c.items.length > 8) c.items.length = 8; // keep the avatar strip sane
     }
@@ -458,6 +480,32 @@
     return wrap;
   }
 
+  // YouTube's own thumb glyph shape; constant markup, never user data
+  const THUMB_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 21h4V9H2v12Zm20-11a2 2 0 0 0-2-2h-6.31l.95-4.57.03-.32a1.5 1.5 0 0 0-.44-1.06L13.17 1 6.59 7.59A1.98 1.98 0 0 0 6 9v10a2 2 0 0 0 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2Z"/></svg>';
+
+  /** 1.2K / 12K / 1.2M, the way YouTube writes them (truncated, not rounded) */
+  function fmtCount(n) {
+    if (!n || n < 1) return '';
+    if (n < 1000) return String(n);
+    const one = (v) => (Math.floor(v * 10) / 10).toFixed(1).replace(/\.0$/, '');
+    const unit = (v, suffix) => `${v < 10 ? one(v) : Math.floor(v)}${suffix}`;
+    // truncation never rounds up, so plain thresholds are safe:
+    // 999999 -> "999K" (what YouTube shows), 1000000 -> "1M"
+    if (n < 1e6) return unit(n / 1000, 'K');
+    if (n < 1e9) return unit(n / 1e6, 'M');
+    return unit(n / 1e9, 'B');
+  }
+
+  function renderLikes(node, n) {
+    const label = fmtCount(n);
+    if (!label) { node.textContent = ''; node.style.display = 'none'; return; }
+    node.style.display = '';
+    node.innerHTML = THUMB_SVG;
+    const count = document.createElement('span');
+    count.textContent = label;
+    node.appendChild(count);
+  }
+
   function commentRow(item) {
     const row = document.createElement('div');
     row.className = 'ytct-item';
@@ -473,8 +521,12 @@
     const when = document.createElement('span');
     when.className = 'ytct-time';
     when.textContent = fmt(item.t);
+    const likes = document.createElement('span');
+    likes.className = 'ytct-likes';
+    renderLikes(likes, item.likes);
     head.appendChild(who);
     head.appendChild(when);
+    head.appendChild(likes);
 
     const text = document.createElement('div');
     text.className = 'ytct-text';
@@ -533,8 +585,11 @@
     who.className = 'ytct-author';
     const when = document.createElement('span');
     when.className = 'ytct-time';
+    const likes = document.createElement('span');
+    likes.className = 'ytct-likes';
     head.appendChild(who);
     head.appendChild(when);
+    head.appendChild(likes);
 
     const text = document.createElement('div');
     text.className = 'ytct-text';
@@ -552,6 +607,7 @@
       if (!it) return;
       who.textContent = it.author || 'someone';
       when.textContent = fmt(it.t);
+      renderLikes(likes, it.likes);
       text.textContent = it.text.length > 340 ? `${it.text.slice(0, 340)}…` : it.text;
       avatarHolder.innerHTML = '';
       avatarHolder.appendChild(avatarNode(it));
