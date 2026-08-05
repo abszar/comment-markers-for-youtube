@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.6.3
+
+- New icon artwork
+
 ## 1.6.2
 
 - Timestamps inside the comment text are tinted with the marker colour, and
