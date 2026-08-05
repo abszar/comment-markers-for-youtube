@@ -214,6 +214,14 @@
   fill: currentColor;
 }
 
+.ytct-inline-ts {
+  color: var(--ytct-color, #9a9a9a);
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.ytct-inline-ts:hover { text-decoration: underline; }
+
 .ytct-text {
   white-space: pre-wrap;
   overflow-wrap: anywhere;
@@ -237,6 +245,9 @@
 .ytct-others > *:last-child { margin-right: 0; }
 
 .ytct-avatar {
+  /* a flex child by default shrinks - which turned avatars into ovals
+     next to a long comment. Pin it. */
+  flex: 0 0 auto;
   width: 26px;
   height: 26px;
   border-radius: 50%;

@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.6.2
+
+- Timestamps inside the comment text are tinted with the marker colour, and
+  clicking one jumps to that moment
+- Fixed avatars rendering as ovals next to long comments
+
 ## 1.6.1
 
 - Marker colour now defaults to red

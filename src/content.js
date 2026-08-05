@@ -109,18 +109,47 @@
   // 1:23 | 01:23 | 1:02:03 - not preceded/followed by other digits or ':'
   const TS_RE = /(?<![\d:])(\d{1,3}):([0-5]\d)(?::([0-5]\d))?(?![\d:])/g;
 
+  function matchToSeconds(m) {
+    if (m[3] !== undefined) {
+      return parseInt(m[1], 10) * 3600 + parseInt(m[2], 10) * 60 + parseInt(m[3], 10);
+    }
+    return parseInt(m[1], 10) * 60 + parseInt(m[2], 10);
+  }
+
+  /**
+   * Render comment text with its timestamps tinted and clickable. Built from
+   * text nodes rather than innerHTML - the comment is untrusted content.
+   */
+  function renderCommentText(node, raw, limit) {
+    const text = raw.length > limit ? `${raw.slice(0, limit)}…` : raw;
+    node.textContent = '';
+    TS_RE.lastIndex = 0;
+    let last = 0;
+    let m;
+    while ((m = TS_RE.exec(text)) !== null) {
+      if (m.index > last) node.appendChild(document.createTextNode(text.slice(last, m.index)));
+      const secs = matchToSeconds(m);
+      const span = document.createElement('span');
+      span.className = 'ytct-inline-ts';
+      span.textContent = m[0];
+      span.title = `Jump to ${m[0]}`;
+      span.addEventListener('click', (ev) => {
+        ev.stopPropagation();
+        if (state.video) state.video.currentTime = secs;
+      });
+      node.appendChild(span);
+      last = m.index + m[0].length;
+    }
+    if (last < text.length) node.appendChild(document.createTextNode(text.slice(last)));
+  }
+
   function extractTimestamps(text) {
     const out = [];
     if (!text) return out;
     TS_RE.lastIndex = 0;
     let m;
     while ((m = TS_RE.exec(text)) !== null) {
-      let secs;
-      if (m[3] !== undefined) {
-        secs = parseInt(m[1], 10) * 3600 + parseInt(m[2], 10) * 60 + parseInt(m[3], 10);
-      } else {
-        secs = parseInt(m[1], 10) * 60 + parseInt(m[2], 10);
-      }
+      const secs = matchToSeconds(m);
       if (Number.isFinite(secs)) out.push({ seconds: secs, label: m[0] });
       if (out.length > 60) break; // chapter dumps: enough is enough
     }
@@ -591,7 +620,7 @@
 
     const text = document.createElement('div');
     text.className = 'ytct-text';
-    text.textContent = item.text.length > 240 ? `${item.text.slice(0, 240)}…` : item.text;
+    renderCommentText(text, item.text, 240);
 
     body.appendChild(head);
     body.appendChild(text);
@@ -680,7 +709,7 @@
       when.textContent = fmt(it.t);
       renderLikes(likes, it.likes);
       setOpenLink(open, it);
-      text.textContent = it.text.length > 340 ? `${it.text.slice(0, 340)}…` : it.text;
+      renderCommentText(text, it.text, 340);
       avatarHolder.innerHTML = '';
       avatarHolder.appendChild(avatarNode(it));
       [...others.children].forEach((n, i) => n.classList.toggle('ytct-avatar--active', i === idx));
