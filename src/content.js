@@ -165,6 +165,7 @@
     const cep = node.commentEntityPayload;
     if (cep && cep.properties && cep.properties.content) {
       acc.comments.push({
+        id: (cep.properties && cep.properties.commentId) || '',
         text: cep.properties.content.content || '',
         author: (cep.author && (cep.author.displayName || cep.author.channelId)) || '',
         avatar: (cep.author && (cep.author.avatarThumbnailUrl || pickThumb(cep.author.avatarThumbnail))) || '',
@@ -176,6 +177,7 @@
     const cr = node.commentRenderer;
     if (cr && cr.contentText) {
       acc.comments.push({
+        id: cr.commentId || '',
         text: runsToText(cr.contentText),
         author: (cr.authorText && (cr.authorText.simpleText || runsToText(cr.authorText))) || '',
         avatar: pickThumb(cr.authorThumbnail),
@@ -313,7 +315,15 @@
       const host = n.closest('ytd-comment-thread-renderer, ytd-comment-view-model');
       const authorEl = host && host.querySelector('#author-text');
       const img = host && host.querySelector('#author-thumbnail img');
+      // the "3 weeks ago" link is a permalink - the comment id rides in ?lc=
+      let id = '';
+      const permalink = host && host.querySelector('#published-time-text a[href*="lc="]');
+      if (permalink) {
+        try { id = new URL(permalink.href, location.origin).searchParams.get('lc') || ''; }
+        catch (e) { id = ''; }
+      }
       out.push({
+        id,
         text: n.innerText || n.textContent || '',
         author: authorEl ? (authorEl.innerText || '').trim() : '',
         avatar: img ? img.src : '',
@@ -341,6 +351,7 @@
         const key = `${Math.round(s.seconds)}|${c.author}`;
         if (byTime.has(key)) continue;
         byTime.set(key, {
+          id: c.id || '',
           t: s.seconds,
           text: c.text.trim(),
           author: c.author || '',
@@ -496,6 +507,39 @@
     return unit(n / 1e9, 'B');
   }
 
+  const OPEN_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7ZM5 5h5V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5h-2v5H5V5Z"/></svg>';
+
+  /**
+   * YouTube's own permalink format for a single comment - the same URL its
+   * Share option produces. Opening it lands on the video with that comment
+   * highlighted, where the real like and reply buttons live.
+   */
+  function commentUrl(item) {
+    if (!item || !item.id || !state.videoId) return '';
+    return `https://www.youtube.com/watch?v=${encodeURIComponent(state.videoId)}` +
+      `&lc=${encodeURIComponent(item.id)}`;
+  }
+
+  function setOpenLink(a, item) {
+    const url = commentUrl(item);
+    if (!url) { a.style.display = 'none'; a.removeAttribute('href'); return; }
+    a.style.display = '';
+    a.href = url;
+  }
+
+  function openLinkNode(item) {
+    const a = document.createElement('a');
+    a.className = 'ytct-open';
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    a.title = 'Open this comment on YouTube to like or reply';
+    a.innerHTML = OPEN_SVG;
+    // the card itself seeks on click; don't do both
+    a.addEventListener('click', (ev) => ev.stopPropagation());
+    setOpenLink(a, item);
+    return a;
+  }
+
   function renderLikes(node, n) {
     const label = fmtCount(n);
     if (!label) { node.textContent = ''; node.style.display = 'none'; return; }
@@ -527,6 +571,7 @@
     head.appendChild(who);
     head.appendChild(when);
     head.appendChild(likes);
+    head.appendChild(openLinkNode(item));
 
     const text = document.createElement('div');
     text.className = 'ytct-text';
@@ -587,9 +632,11 @@
     when.className = 'ytct-time';
     const likes = document.createElement('span');
     likes.className = 'ytct-likes';
+    const open = openLinkNode(cluster.items[0]);
     head.appendChild(who);
     head.appendChild(when);
     head.appendChild(likes);
+    head.appendChild(open);
 
     const text = document.createElement('div');
     text.className = 'ytct-text';
@@ -608,6 +655,7 @@
       who.textContent = it.author || 'someone';
       when.textContent = fmt(it.t);
       renderLikes(likes, it.likes);
+      setOpenLink(open, it);
       text.textContent = it.text.length > 340 ? `${it.text.slice(0, 340)}…` : it.text;
       avatarHolder.innerHTML = '';
       avatarHolder.appendChild(avatarNode(it));

@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.3.0
+
+- Each comment now has a link that opens it on YouTube, highlighted, where
+  you can like or reply with YouTube's own buttons
+
 ## 1.2.0
 
 - Comments now show their YouTube like count, formatted 1.2K / 12K / 1.2M
