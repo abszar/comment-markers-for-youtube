@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.6.1
+
+- Marker colour now defaults to red
+- Fixed the timestamp, like count and icons sitting a few pixels apart
+  vertically in the card header
+
 ## 1.6.0
 
 - The marker colour now also tints the timestamp, the like count and the

@@ -3,7 +3,7 @@ const DEFAULTS = {
   autoPopup: true,
   popupDuration: 5,
   popupCenter: false,
-  markerColor: '#ffffff',
+  markerColor: '#ff0000',
   markerAvatars: false,
   avatarSize: 15,
   maxComments: 400,

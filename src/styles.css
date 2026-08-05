@@ -6,7 +6,7 @@
   /* never intercept the pointer: YouTube's own scrub preview keeps working */
   pointer-events: none;
   z-index: 39;
-  --ytct-color: #ffffff;
+  --ytct-color: #ff0000;
 }
 
 .ytct-marker {
@@ -63,7 +63,7 @@
 /* ------------------------------------------------------------- comment cards */
 
 .ytct-bubble-layer {
-  --ytct-color: #ffffff;
+  --ytct-color: #ff0000;
   position: absolute;
   left: 0;
   right: 0;
@@ -128,9 +128,10 @@
 .ytct-head {
   display: flex;
   gap: 8px;
-  align-items: baseline;
-  margin-bottom: 2px;
+  align-items: center;
+  margin-bottom: 3px;
   min-width: 150px;
+  line-height: 1.2;
 }
 
 .ytct-author {
@@ -153,6 +154,7 @@
 .ytct-likes {
   display: inline-flex;
   align-items: center;
+  line-height: 1;
   gap: 3px;
   font-size: 11px;
   color: var(--ytct-color, #9a9a9a);
@@ -197,6 +199,7 @@
 .ytct-open {
   display: inline-flex;
   align-items: center;
+  line-height: 1;
   color: #8a8a8a;
   pointer-events: auto;
   text-decoration: none;
