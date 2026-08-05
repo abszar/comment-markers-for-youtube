@@ -1,4 +1,7 @@
 const KEYS = { enabled: true, autoPopup: true, markerAvatars: false };
+const MAX_REMEMBERED = 300;
+
+let currentVideoId = null;
 
 function setStatus(text) {
   document.getElementById('status').textContent = text;
@@ -12,17 +15,59 @@ function withActiveTab(cb) {
   });
 }
 
+/* ------------------------------------------------------- per-video toggle */
+
+function paintVideoRow() {
+  const row = document.getElementById('videoRow');
+  const box = document.getElementById('videoEnabled');
+  if (!currentVideoId) {
+    row.classList.add('disabled');
+    box.checked = true;
+    return;
+  }
+  row.classList.remove('disabled');
+  chrome.storage.sync.get({ disabledVideos: [] }, (res) => {
+    const list = res.disabledVideos || [];
+    box.checked = list.indexOf(currentVideoId) === -1;
+  });
+}
+
+document.getElementById('videoEnabled').addEventListener('change', (e) => {
+  if (!currentVideoId) return;
+  chrome.storage.sync.get({ disabledVideos: [] }, (res) => {
+    let list = (res.disabledVideos || []).filter((id) => id !== currentVideoId);
+    if (!e.target.checked) {
+      list.push(currentVideoId);
+      // storage.sync is small; keep the newest entries only
+      if (list.length > MAX_REMEMBERED) list = list.slice(list.length - MAX_REMEMBERED);
+    }
+    chrome.storage.sync.set({ disabledVideos: list }, () => {
+      setStatus(e.target.checked
+        ? 'On for this video - reload the tab if markers are missing.'
+        : 'Off for this video.');
+    });
+  });
+});
+
+/* ---------------------------------------------------------------- status */
+
 function refreshStatus() {
   withActiveTab((tab) => {
     chrome.tabs.sendMessage(tab.id, { type: 'ytct:status' }, (res) => {
       if (chrome.runtime.lastError || !res) {
+        currentVideoId = null;
+        paintVideoRow();
         setStatus('Open a YouTube video, then reopen this popup.');
         return;
       }
+      currentVideoId = res.videoId || null;
+      paintVideoRow();
       setStatus(res.status === 'idle' ? 'Waiting for a video…' : String(res.status));
     });
   });
 }
+
+/* --------------------------------------------------------- global toggles */
 
 chrome.storage.sync.get(KEYS, (res) => {
   const v = { ...KEYS, ...(res || {}) };

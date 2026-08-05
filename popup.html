@@ -63,6 +63,8 @@
     .switch input:checked + .slider { background: var(--red); }
     .switch input:checked + .slider::before { transform: translateX(17px); }
 
+    .row.disabled { opacity: 0.4; pointer-events: none; }
+
     #status {
       font-size: 11px; color: var(--muted);
       margin: 12px 0 12px; min-height: 15px; line-height: 1.4;
@@ -106,6 +108,11 @@
   <div class="row">
     <span>Avatars on timeline</span>
     <label class="switch"><input type="checkbox" id="markerAvatars"><span class="slider"></span></label>
+  </div>
+
+  <div class="row" id="videoRow">
+    <span>On this video</span>
+    <label class="switch"><input type="checkbox" id="videoEnabled"><span class="slider"></span></label>
   </div>
 
   <div id="status">…</div>

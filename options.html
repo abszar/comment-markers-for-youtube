@@ -270,6 +270,16 @@
     #save { background: var(--red); color: #fff; }
     #save:hover { background: var(--red-dim); }
 
+    button.mini {
+      padding: 6px 14px;
+      font-size: 12px;
+      background: transparent;
+      color: var(--text);
+      border-color: var(--line);
+    }
+
+    button.mini:hover { border-color: #5a5a5a; background: #101010; }
+
     #reset { background: transparent; color: var(--text); border-color: var(--line); }
     #reset:hover { border-color: #5a5a5a; background: var(--card); }
 
@@ -403,6 +413,15 @@
 
     <section>
       <div class="sec-title">Advanced</div>
+
+      <div class="row">
+        <div class="label">Videos you switched off
+          <span class="hint">Use the toolbar popup to disable the extension for one video. They are listed here.</span></div>
+        <div class="control">
+          <span class="chip" id="disabledCount">0</span>
+          <button id="clearDisabled" class="mini">Clear</button>
+        </div>
+      </div>
 
       <div class="row">
         <div class="label">Debug logging

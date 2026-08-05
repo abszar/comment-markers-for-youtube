@@ -23,7 +23,8 @@
     maxComments: 400,
     maxMarkers: 120,
     minLikes: 0,
-    debug: false
+    debug: false,
+    disabledVideos: []
   };
 
   let settings = { ...DEFAULTS };
@@ -71,6 +72,11 @@
         resolve({ ...DEFAULTS });
       }
     });
+  }
+
+  /** per-video opt-out, toggled from the toolbar popup */
+  function disabledHere(s, id) {
+    return !!id && Array.isArray(s.disabledVideos) && s.disabledVideos.indexOf(id) !== -1;
   }
 
   function videoIdFromUrl() {
@@ -950,8 +956,11 @@
   async function boot({ force = false } = {}) {
     settings = await getSettings();
     const id = videoIdFromUrl();
-    if (!id) { stop(); state.videoId = null; return; }
-    if (!settings.enabled) { stop(); return; }
+    // keep the id even when switched off, so the popup can offer the toggle
+    state.videoId = id;
+    if (!id) { stop(); state.status = 'no video here'; return; }
+    if (!settings.enabled) { stop(); state.status = 'switched off'; return; }
+    if (disabledHere(settings, id)) { stop(); state.status = 'off for this video'; return; }
     await run(id, { force });
   }
 
@@ -978,11 +987,12 @@
     chrome.storage.onChanged.addListener((changes, area) => {
       if (area !== 'sync') return;
       getSettings().then((s) => {
-        const wasEnabled = settings.enabled;
+        const wasActive = state.clusters.length > 0;
         settings = s;
-        if (!s.enabled) { stop(); return; }
-        if (!wasEnabled) { boot({ force: true }); return; }
-        if (state.video && state.video.duration && state.clusters.length) renderMarkers(state.video.duration);
+        const id = videoIdFromUrl();
+        if (!s.enabled || !id || disabledHere(s, id)) { stop(); boot(); return; }
+        if (!wasActive) { boot({ force: true }); return; }
+        if (state.video && state.video.duration) renderMarkers(state.video.duration);
       });
     });
 

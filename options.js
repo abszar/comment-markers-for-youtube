@@ -9,7 +9,8 @@ const DEFAULTS = {
   maxComments: 400,
   maxMarkers: 120,
   minLikes: 0,
-  debug: false
+  debug: false,
+  disabledVideos: []
 };
 
 const FIELDS = Object.keys(DEFAULTS);
@@ -62,10 +63,20 @@ function paintDuration() {
   el('avatarSizeValue').textContent = `${el('avatarSize').value}px`;
 }
 
+function paintDisabled() {
+  chrome.storage.sync.get({ disabledVideos: [] }, (res) => {
+    const n = (res.disabledVideos || []).length;
+    el('disabledCount').textContent = n;
+    el('clearDisabled').disabled = n === 0;
+    el('clearDisabled').style.opacity = n === 0 ? 0.45 : 1;
+  });
+}
+
 function repaint() {
   paintPreview();
   paintSwatches();
   paintDuration();
+  paintDisabled();
 }
 
 /* ------------------------------------------------------------ form <-> data */
@@ -137,6 +148,13 @@ el('avatarSize').addEventListener('input', repaint);
 
 el('save').addEventListener('click', () => {
   chrome.storage.sync.set(collect(), () => flash('Saved - reload your YouTube tab to apply.'));
+});
+
+el('clearDisabled').addEventListener('click', () => {
+  chrome.storage.sync.set({ disabledVideos: [] }, () => {
+    paintDisabled();
+    flash('Cleared - the extension runs on every video again.');
+  });
 });
 
 el('reset').addEventListener('click', () => {

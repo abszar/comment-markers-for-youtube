@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.4.0
+
+- New "On this video" switch in the toolbar popup, to turn the extension off
+  for one video without disabling it everywhere
+- Settings page shows how many videos you have switched off, with a Clear
+  button
+
 ## 1.3.0
 
 - Each comment now has a link that opens it on YouTube, highlighted, where
