@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.6.0
+
+- The marker colour now also tints the timestamp, the like count and the
+  close button on the comment cards, instead of only the timeline ticks
+
 ## 1.5.0
 
 - Playing popups now have a close button, so a comment you've finished

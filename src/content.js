@@ -430,7 +430,15 @@
       state.bubbleLayer = bl;
     }
     state.player = player;
+    applyAccent();
     return true;
+  }
+
+  /** the chosen colour has to reach both layers - they are separate subtrees */
+  function applyAccent() {
+    const c = settings.markerColor || '#ffffff';
+    if (state.markerLayer) state.markerLayer.style.setProperty('--ytct-color', c);
+    if (state.bubbleLayer) state.bubbleLayer.style.setProperty('--ytct-color', c);
   }
 
   function clearUi() {
@@ -443,7 +451,7 @@
   function renderMarkers(duration) {
     if (!ensureLayers()) return;
     state.markerLayer.innerHTML = '';
-    state.markerLayer.style.setProperty('--ytct-color', settings.markerColor);
+    applyAccent();
     const avSize = Math.min(40, Math.max(4, Number(settings.avatarSize) || 15));
     state.markerLayer.style.setProperty('--ytct-avatar-size', `${avSize}px`);
     if (!duration) return;
