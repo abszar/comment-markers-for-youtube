@@ -74,6 +74,7 @@
 
 .ytct-card {
   position: absolute;
+  box-sizing: border-box;
   bottom: 0;
   max-width: min(400px, 44%);
   padding: 9px 11px;

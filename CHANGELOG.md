@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.1
+
+- Fixed the playing popup jumping when switching between comments of
+  different lengths at the same timestamp
+
 ## 1.1.0
 
 - New icon: a comment bubble dropping onto the video timeline

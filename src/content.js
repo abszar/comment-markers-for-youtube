@@ -575,6 +575,27 @@
       if (state.video) state.video.currentTime = cluster.t;
     });
 
+    /**
+     * Comments differ in length, so switching tabs used to resize the card.
+     * The card is anchored by its bottom edge, so a resize moved its top edge
+     * AND the avatar strip sitting above it - the whole thing jumped under the
+     * pointer. Measure every comment once the card is in the DOM and pin the
+     * box to the largest, so switching only changes the text.
+     */
+    card.ytctLockBox = () => {
+      if (cluster.items.length < 2) return;
+      let w = 0;
+      let h = 0;
+      for (let i = 0; i < cluster.items.length; i += 1) {
+        show(i);
+        w = Math.max(w, card.offsetWidth);
+        h = Math.max(h, card.offsetHeight);
+      }
+      show(0);
+      card.style.minWidth = `${w}px`;
+      card.style.minHeight = `${h}px`;
+    };
+
     return card;
   }
 
@@ -607,6 +628,7 @@
     card.addEventListener('mouseleave', () => { rec.hovered = false; });
 
     state.bubbleLayer.appendChild(card);
+    if (card.ytctLockBox) card.ytctLockBox();
     liveBubbles.add(rec);
     requestAnimationFrame(() => card.classList.add('ytct-card--in'));
   }
