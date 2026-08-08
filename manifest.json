@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Comment Markers for YouTube",
-  "version": "1.6.4",
+  "version": "1.6.5",
   "description": "Marks the timestamps people mention in YouTube comments on the video's timeline, and pops the comment up as you reach it.",
   "permissions": [
     "storage"

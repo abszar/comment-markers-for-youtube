@@ -39,6 +39,9 @@
     hoverCardOver: false,
     hoverHideTimer: null,
     clusters: [],
+    loadedId: null,   // the video the markers on screen belong to
+    loadingId: null,
+    gen: 0,           // bumped per load, so a stale fetch can't render
     lastTime: 0,
     loading: false,
     status: 'idle',
@@ -962,11 +965,18 @@
   /* ------------------------------------------------------------------- main */
 
   async function run(videoId, { force = false } = {}) {
-    if (state.loading) return;
-    if (!force && state.videoId === videoId && state.clusters.length) return;
+    // already showing this video's comments
+    if (!force && state.loadedId === videoId && state.clusters.length) return;
+    // already fetching this video (navigation fires more than one boot)
+    if (!force && state.loading && state.loadingId === videoId) return;
+
+    // any load still in flight belongs to a video we have navigated away from
+    const gen = ++state.gen;
+    const stale = () => gen !== state.gen;
 
     state.loading = true;
-    state.videoId = videoId;
+    state.loadingId = videoId;
+    state.loadedId = null;
     state.clusters = [];
     state.status = 'loading';
     clearUi();
@@ -976,10 +986,12 @@
         () => document.querySelector('#movie_player video') || document.querySelector('video.html5-main-video'),
         20000
       );
+      if (stale()) return;
       if (!video) throw new Error('no video element');
       attachVideo(video);
 
       await waitFor(() => video.duration && Number.isFinite(video.duration), 20000);
+      if (stale()) return;
 
       let comments = [];
       try {
@@ -987,24 +999,35 @@
       } catch (e) {
         log('api failed, falling back to DOM:', e.message);
       }
+      if (stale()) return;
       if (!comments.length) comments = fetchCommentsFromDom();
 
       const entries = buildEntries(comments, video.duration);
       state.clusters = capClusters(clusterEntries(entries, video.duration));
+      state.loadedId = videoId;
       state.status = `${entries.length} timestamp(s) in ${state.clusters.length} spot(s), from ${comments.length} comment(s)`;
       renderMarkers(video.duration);
       state.lastTime = video.currentTime;
     } catch (e) {
-      state.status = `error: ${e.message}`;
-      log('run failed', e);
+      if (!stale()) {
+        state.status = `error: ${e.message}`;
+        log('run failed', e);
+      }
     } finally {
-      state.loading = false;
+      if (!stale()) {
+        state.loading = false;
+        state.loadingId = null;
+      }
     }
   }
 
   function stop() {
-    clearUi();
+    state.gen += 1;          // abandon anything in flight
+    state.loading = false;
+    state.loadingId = null;
+    state.loadedId = null;
     state.clusters = [];
+    clearUi();
   }
 
   async function boot({ force = false } = {}) {
@@ -1015,6 +1038,7 @@
     if (!id) { stop(); state.status = 'no video here'; return; }
     if (!settings.enabled) { stop(); state.status = 'switched off'; return; }
     if (disabledHere(settings, id)) { stop(); state.status = 'off for this video'; return; }
+    if (state.loadedId && state.loadedId !== id) stop();
     await run(id, { force });
   }
 

@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.6.5
+
+- Fixed the previous video's comments staying on screen after navigating to
+  another video in the same tab
+
 ## 1.6.4
 
 - New icon artwork
